@@ -1,0 +1,272 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="imgui\imgui.cpp">
+      <Filter>Linked\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_demo.cpp">
+      <Filter>Linked\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_draw.cpp">
+      <Filter>Linked\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_glfw.cpp">
+      <Filter>Linked\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_impl_opengl3.cpp">
+      <Filter>Linked\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_tables.cpp">
+      <Filter>Linked\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_widgets.cpp">
+      <Filter>Linked\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Widgets.cpp">
+      <Filter>Исходные файлы\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLWrappers.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjLoader.cpp">
+      <Filter>Исходные файлы\Drawing\Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="PhotonMapping.cpp">
+      <Filter>Исходные файлы\Drawing\PhotonMapping</Filter>
+    </ClCompile>
+    <ClCompile Include="PhotonMap.cpp">
+      <Filter>Исходные файлы\Drawing\PhotonMapping</Filter>
+    </ClCompile>
+    <ClCompile Include="PMModel.cpp">
+      <Filter>Исходные файлы\Drawing\PhotonMapping</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools.cpp">
+      <Filter>Исходные файлы\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="PMTools.cpp">
+      <Filter>Исходные файлы\Drawing\PhotonMapping</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWindow.cpp">
+      <Filter>Исходные файлы\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="PMDrawer.cpp">
+      <Filter>Исходные файлы\Drawing\PhotonMapping</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Selector.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitives.h">
+      <Filter>Файлы заголовков\Drawing\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimitiveChanger.h">
+      <Filter>Файлы заголовков\Changers</Filter>
+    </ClInclude>
+    <ClInclude Include="Widgets.h">
+      <Filter>Файлы заголовков\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLWrappers.h">
+      <Filter>Файлы заголовков\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="FigureBuilder.h">
+      <Filter>Файлы заголовков\Drawing\Drawable\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Figure.h">
+      <Filter>Файлы заголовков\Drawing\Drawable\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreeDInterface.h">
+      <Filter>Файлы заголовков\Drawing\Drawable\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawer.h">
+      <Filter>Файлы заголовков\Drawing\Drawers</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureDrawer.h">
+      <Filter>Файлы заголовков\Drawing\Drawers</Filter>
+    </ClInclude>
+    <ClInclude Include="Projection.h">
+      <Filter>Файлы заголовков\MVP</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Файлы заголовков\MVP</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Файлы заголовков\Drawing\Drawable\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Файлы заголовков\Drawing\Drawable\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjLoader.h">
+      <Filter>Файлы заголовков\Drawing\Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjModel.h">
+      <Filter>Файлы заголовков\Drawing\Drawable\OBJ</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjMesh.h">
+      <Filter>Файлы заголовков\Drawing\Drawable\OBJ</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Файлы ресурсов</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Linked</Filter>
+    </ClInclude>
+    <ClInclude Include="PhotonMapping.h">
+      <Filter>Файлы заголовков\Drawing\PhotonMapping</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Файлы заголовков\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Файлы заголовков\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools.h">
+      <Filter>Файлы заголовков\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="PhotonMap.h">
+      <Filter>Файлы заголовков\Drawing\PhotonMapping</Filter>
+    </ClInclude>
+    <ClInclude Include="Photon.h">
+      <Filter>Файлы заголовков\Drawing\PhotonMapping</Filter>
+    </ClInclude>
+    <ClInclude Include="PMModel.h">
+      <Filter>Файлы заголовков\Drawing\PhotonMapping</Filter>
+    </ClInclude>
+    <ClInclude Include="PMTools.h">
+      <Filter>Файлы заголовков\Drawing\PhotonMapping</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWindow.h">
+      <Filter>Файлы заголовков\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="PMDrawer.h">
+      <Filter>Файлы заголовков\Drawing\PhotonMapping</Filter>
+    </ClInclude>
+    <ClInclude Include="PMSettingsUpdater.h">
+      <Filter>Файлы заголовков\Drawing\PhotonMapping</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="main.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="main.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="phong.frag">
+      <Filter>Shaders\phong</Filter>
+    </None>
+    <None Include="lamp.vert">
+      <Filter>Shaders\lamp</Filter>
+    </None>
+    <None Include="lamp.frag">
+      <Filter>Shaders\lamp</Filter>
+    </None>
+    <None Include="phong.vert">
+      <Filter>Shaders\phong</Filter>
+    </None>
+    <None Include="pp_default.vert">
+      <Filter>Shaders\PP</Filter>
+    </None>
+    <None Include="layer.frag">
+      <Filter>Shaders\PP</Filter>
+    </None>
+    <None Include="FXAA.frag">
+      <Filter>Shaders\PP\AA</Filter>
+    </None>
+    <None Include="pp_final.frag">
+      <Filter>Shaders\PP</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{01504cec-8520-4f81-9473-2ae4ea66f5cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\lamp">
+      <UniqueIdentifier>{3d833b05-b7c7-4be0-8021-33747019c965}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\phong">
+      <UniqueIdentifier>{dfb1c519-ffe9-4954-b1ea-14e243bf0f8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{cc743150-6a4c-43ac-8897-b36d1a10f560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{d137389e-e6c9-48f9-bed8-c5a9a6281241}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Widgets">
+      <UniqueIdentifier>{4f2960e3-0261-42bc-a1d9-1a2605513065}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{e5e069aa-0506-4a82-bfa5-530c6d546cd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Changers">
+      <UniqueIdentifier>{c90c7da6-2a78-4f07-8f61-e102b6344454}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Widgets">
+      <UniqueIdentifier>{31710da6-7e58-4d6f-998e-11181da7bf24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Drawing">
+      <UniqueIdentifier>{86d28616-4d0d-4785-9807-cfe6421d99ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Drawing\Drawable">
+      <UniqueIdentifier>{d341c541-efac-4537-9aab-e3408bda7e3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Drawing\Drawable\3D">
+      <UniqueIdentifier>{f534ff00-835e-4650-998c-c34a11622a05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Drawing\Drawable\OBJ">
+      <UniqueIdentifier>{df34a887-830c-4d1b-a63b-281f376842ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Drawing\Drawers">
+      <UniqueIdentifier>{885f352d-3677-4ac9-8da2-31791e8f812e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Drawing\Loaders">
+      <UniqueIdentifier>{03cbb77f-9084-4b82-9c9f-a887ff272194}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\MVP">
+      <UniqueIdentifier>{3490c16f-edfb-42ea-a45c-3f1ab56b4c1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Linked">
+      <UniqueIdentifier>{4a3dfcda-a6a4-4cec-b455-538ce593d804}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Linked\imgui">
+      <UniqueIdentifier>{3ea91581-f06a-45db-9f90-c6b2299c5567}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Drawing\PhotonMapping">
+      <UniqueIdentifier>{67ce12d2-c9f9-45a5-8b46-0c98e032a40a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Drawing">
+      <UniqueIdentifier>{48d78580-bcba-442c-9ac8-427cda3a04a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Drawing\Drawable">
+      <UniqueIdentifier>{3e75f0c3-6915-4f00-9128-b1e80b705986}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Tools">
+      <UniqueIdentifier>{791f6802-a1c6-4594-8054-fbbef97f4b12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Drawing\Loaders">
+      <UniqueIdentifier>{cca11c14-55ec-462a-92b4-207077335023}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Drawing\PhotonMapping">
+      <UniqueIdentifier>{669edb40-9d03-4ea7-9b68-e122cf465e52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Tools">
+      <UniqueIdentifier>{f7279428-c100-4e1d-af65-459782fb4dc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\PP">
+      <UniqueIdentifier>{15667bbe-1d60-437b-888c-3c232997a306}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PP">
+      <UniqueIdentifier>{72b0307d-917d-4cda-8bb0-e69ef32e69a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PP\AA">
+      <UniqueIdentifier>{54ce376f-bcc9-4e0b-846d-e08ad8a106cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PP\AA\SSAA">
+      <UniqueIdentifier>{3410c22a-93ab-4487-9eff-a4b9dbbda1c3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
