@@ -36,11 +36,9 @@ int main() {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     glewInit();
     srand(static_cast <unsigned> (time(0)));
-
     auto manager = OpenGLManager::get_instance();
     Init(manager);
     drawer.opengl_init();
-
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -125,6 +123,7 @@ void Init(OpenGLManager* manager) {
     load_preset("./models/cornell_box_original", "CornellBox-Original.obj", presets);
     presets.back().pos = glm::vec3(-0.00999999046, 0.795000017, 2.35000001);
     presets.back().dir = glm::vec3(0.f, 0.f, -1.f);
+    //presets.back().global_map_path = "photon_maps"
 
     load_preset("./models/cornell_box_sphere", "CornellBox-Sphere.obj", presets);
     presets.back().pos = glm::vec3(-0.00999999046, 0.795000017, 2.35000001);

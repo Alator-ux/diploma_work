@@ -31,6 +31,8 @@ class MainWindow : public Window {
         void draw() override {
             if (presets.draw()) {
                 pmsu->update_preset(convert<int>(presets.get_value()));
+                pm->check_names();
+                pmsu->update_names = true;
             }
             ImGui::Text("Number of photons");
             if (gp_count.draw()) {
@@ -122,6 +124,33 @@ class MainWindow : public Window {
             if (ImGui::Button("Render")) {
                 pm->render();
                 pmsu->update_layers_status(true);
+            }
+        }
+    };
+    class TextureCreatorWindow : public Window {
+        PhotonMapping* pm;
+        PMSettingsUpdater* pmsu;
+        DropDownMenu object_selector;
+        InputInt resolution;
+    public:
+        TextureCreatorWindow(PMSettingsUpdater* pmsu, PhotonMapping* pm) :
+            resolution("Texture resolution", 100, 10), object_selector("Objects", pmsu->get_names())
+        {
+            this->pm = pm;
+            this->pmsu = pmsu;
+        }
+        void draw() override {
+            if (pmsu->update_names) {
+                object_selector = DropDownMenu("Objects", pmsu->get_names());
+                pmsu->update_names = false;
+            }
+            resolution.draw();
+            object_selector.draw();
+            ImGui::NewLine();
+            if (ImGui::Button("Gen")) {
+                pmsu->update_tex_resol(resolution.get_value());
+                pmsu->update_texmodel_name(convert<std::string>(object_selector.get_item()));
+                pm->gen_caustic_texture();
             }
         }
     };
@@ -226,10 +255,11 @@ class MainWindow : public Window {
     TabBar window_selector;
 public:
     MainWindow(PMSettingsUpdater* pmsu, PhotonMapping* pm, PMDrawer* drawer) :
-        window_selector({ "Photon Tr", "Ray Tr", "Layer Sh", "Bloom Sh", "Grain Sh" }) {
+        window_selector({ "Photon Tr", "Ray Tr", "Text Cr", "Layer Sh", "Bloom Sh", "Grain Sh"}) {
         this->pmsu = pmsu;
         windows.push_back(std::unique_ptr<Window>(new PhotonTracingWindow(pmsu, pm)));
         windows.push_back(std::unique_ptr<Window>(new RayTracingWindow(pmsu, pm, drawer)));
+        windows.push_back(std::unique_ptr<Window>(new TextureCreatorWindow(pmsu, pm)));
         windows.push_back(std::unique_ptr<Window>(new FastChangesWindow(pmsu, drawer)));
         windows.push_back(std::unique_ptr<Window>(new BloomWindow(pmsu)));
         windows.push_back(std::unique_ptr<Window>(new GrainWindow(pmsu)));

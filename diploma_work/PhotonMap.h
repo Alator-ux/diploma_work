@@ -10,6 +10,7 @@
 #include "Photon.h"
 #include "queue"
 #include "PMSettingsUpdater.h"
+#include <string>
 class PhotonMap {
     struct Node {
         Photon value;
@@ -114,13 +115,16 @@ private:
     bool locate_q(NearestPhotons* np) const;
     bool locate_r(NearestPhotons* np) const;
 public:
-    bool radiance_estimate(const glm::vec3& inc_dir, const glm::vec3& iloc, 
+    bool radiance_estimate(const glm::vec3& iloc, 
         const glm::vec3& norm, glm::vec3& out_rad);
+    bool radiance_estimate_tex(const glm::vec3& iloc, const glm::vec3& norm, glm::vec3& out_rad);
     void fill_balanced(const std::vector<Photon>& points);
     PhotonMap();
     PhotonMap(Type type);
     ~PhotonMap();
     void clear();
+    void save(const std::string& filename);
+    void load(const std::string& filename);
     void total_locate_time();
     void set_settings_updater(PMSettingsUpdater& pmsu);
 };

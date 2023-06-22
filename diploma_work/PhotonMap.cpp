@@ -254,7 +254,7 @@ Timer timer;
 void PhotonMap::total_locate_time() {
     timer.print_total();
 }
-bool PhotonMap::radiance_estimate(const glm::vec3& inc_dir, const glm::vec3& iloc, const glm::vec3& norm, glm::vec3& out_rad) {
+bool PhotonMap::radiance_estimate(const glm::vec3& iloc, const glm::vec3& norm, glm::vec3& out_rad) {
     out_rad.x = out_rad.y = out_rad.z = 0;
     if (size == 0 || settings.np_size == 0) {
         return false;
@@ -277,7 +277,33 @@ bool PhotonMap::radiance_estimate(const glm::vec3& inc_dir, const glm::vec3& ilo
         }
     }
 
-    //float temp = (1.f / (M_PI * r * r * this->filters[settings.ftype]->norm_coef));
+    float temp = (1.f / (M_PI * (r * r) * this->filters[settings.ftype]->norm_coef));
+    out_rad *= temp;
+    return true;
+}
+bool PhotonMap::radiance_estimate_tex(const glm::vec3& iloc, const glm::vec3& norm, glm::vec3& out_rad) {
+    out_rad.x = out_rad.y = out_rad.z = 0;
+    if (size == 0 || settings.np_size == 0) {
+        return false;
+    }
+    NearestPhotons np(iloc, norm, settings.np_size);
+    if (!locate_r(&np)) {
+        return false;
+    }
+
+    float r, filter_r;
+    filter_r = r = glm::distance(iloc, (np.container[0].pos));
+    if (settings.ftype == PhotonMapSettings::FilterType::gaussian) {
+        filter_r *= filter_r;
+    }
+    for (size_t i = 0; i < np.container.size(); i++) {
+        auto& p = np.container[i];
+        float cosNL = glm::dot(-p.inc_dir, norm);
+        if (cosNL > 0.f) {
+            out_rad += p.power * (this->filters[settings.ftype])->call(p.pos, iloc, filter_r);
+        }
+    }
+
     float temp = (1.f / (M_PI * (r * r) * this->filters[settings.ftype]->norm_coef));
     out_rad *= temp;
     return true;
@@ -287,14 +313,13 @@ PhotonMap::PhotonMap(Type type) {
     this->type = type;
     this->size = 0;
     this->root = nullptr;
-}
-void PhotonMap::fill_balanced(const std::vector<Photon>& photons) {
-    size = photons.size();
-    
     filters = std::vector<Filter*>(3);
     filters[PhotonMapSettings::FilterType::none] = new Filter(1.f);
     filters[PhotonMapSettings::FilterType::cone] = new ConeFilter(settings.cf_k);
     filters[PhotonMapSettings::FilterType::gaussian] = new GaussianFilter(settings.gf_alpha, settings.gf_beta);
+}
+void PhotonMap::fill_balanced(const std::vector<Photon>& photons) {
+    size = photons.size();
     //heap = new glm::vec3*[size];
 
     if (photons.size() == 0) {
@@ -375,13 +400,86 @@ void PhotonMap::fill_balanced(const std::vector<Photon>& photons) {
 }
 PhotonMap::~PhotonMap() {
     clear();
+    for (Filter* filter : filters) {
+        delete filter;
+    }
 }
 void PhotonMap::clear() {
     delete root;
     root = nullptr;
-    for (Filter* filter : filters) {
-        delete filter;
+}
+void PhotonMap::save(const std::string& filename) {
+    std::ofstream file(filename, std::ios::binary | std::ios::trunc);
+
+    if (!file.is_open()) {
+        std::cout << "Ошибка открытия файла для записи: " << filename << std::endl;
+        return;
     }
+    std::stack<Node*> nodeStack;
+    nodeStack.push(root);
+
+    while (!nodeStack.empty()) {
+        Node* node = nodeStack.top();
+        nodeStack.pop();
+
+        // Сохраняем значение фотона
+        file.write(reinterpret_cast<char*>(&node->value), sizeof(Photon));
+
+        // Сохраняем значение плоскости
+        file.write(reinterpret_cast<char*>(&node->plane), sizeof(short));
+        // Проверяем и сохраняем указатели на левое и правое поддеревья
+        if (node->right) {
+            nodeStack.push(node->right);
+        }
+        if (node->left) {
+            nodeStack.push(node->left);
+        }
+    }
+
+    file.close();
+
+    std::cout << "Дерево успешно сохранено в файл: " << filename << std::endl;
+}
+void PhotonMap::load(const std::string& filename) {
+    std::ifstream file(filename, std::ios::binary);
+
+    if (!file.is_open()) {
+        std::cout << "Ошибка открытия файла для чтения: " << filename << std::endl;
+        return;
+    }
+    clear();
+    size = 0;
+    std::stack<Node*> nodeStack;
+    while (!file.eof()) {
+        Node* node = new Node();
+
+        file.read(reinterpret_cast<char*>(&node->value), sizeof(Photon));
+
+        file.read(reinterpret_cast<char*>(&node->plane), sizeof(short));
+
+        node->left = nullptr;
+        node->right = nullptr;
+
+        if (root == nullptr) {
+            root = node;
+        }
+        else {
+            Node* parent = nodeStack.top();
+            if (parent->left == nullptr) {
+                parent->left = node;
+            }
+            else {
+                parent->right = node;
+                nodeStack.pop();
+            }
+        }
+        size++;
+        nodeStack.push(node);
+    }
+
+    file.close();
+
+    std::cout << "Photon map is loaded, size = " << size << std::endl;
 }
 void PhotonMap::set_settings_updater(PMSettingsUpdater& pmsu) {
     if (type == def) {

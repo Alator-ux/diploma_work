@@ -35,28 +35,34 @@ public:
         return _activated;
     }
 };
-
+class InputString : public Widget {
+    char content[256];
+    int min_size;
+    std::string str_content = "t";
+public:
+    InputString(const char* label, int min_size)
+        : Widget(label, false), min_size(min_size) { }
+    bool draw() override {
+        bool drawn = ImGui::InputText(label, content, 256);
+        if (strlen(content) == 0)
+        {
+            strcpy_s(content, "t");
+        }
+        if (drawn) {
+            str_content = std::string(content);
+        }
+        return drawn;
+    }
+    const void* get_value() override {
+        return (void*)(&str_content);
+    }
+};
 class Row : public Widget {
     std::vector<std::shared_ptr <Widget>> childs;
 public:
     Row(const char* label) : Widget(label, false), childs() {}
     Row(const char* label, std::vector<std::shared_ptr <Widget>>&& childs) : Widget(label, false) {
         set_childs(std::move(childs));
-        //this->active = -1;
-        /*for (size_t i = 0; i < this->childs.size(); i++) {
-            if (this->childs[i].activated()) {
-                if (this->active == -1) {
-                    this->active = i;
-                }
-                else {
-                    this->childs[i].disable();
-                }
-            }
-        }
-        if (this->active == -1) {
-            this->childs.front().activate();
-            this->active = 0;
-        }*/
     }
     void set_childs(std::vector<std::shared_ptr <Widget>>&& childs) {
         this->childs = std::move(childs);

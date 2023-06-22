@@ -46,3 +46,11 @@ void print_vec3(const glm::vec3& value, const std::string& prefix, const std::st
         << "vec3(x=" << value.x << ",y=" << value.y << ",z=" << value.z << ")" 
         << postfix << std::endl;
 }
+
+glm::vec3 interpolate_uvw(const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& uvw) {
+    return glm::vec3(
+        v0.x * uvw.x + v1.x * uvw.y + v2.x * uvw.z,
+        v0.y * uvw.x + v1.y * uvw.y + v2.y * uvw.z,
+        v0.z * uvw.x + v1.z * uvw.y + v2.z * uvw.z
+    );
+}

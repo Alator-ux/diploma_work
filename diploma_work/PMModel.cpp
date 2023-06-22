@@ -108,55 +108,26 @@ float triarea(float a, float b, float c)
     float s = (a + b + c) / 2.0;
     return sqrt(s * (s - a) * (s - b) * (s - c));
 }
-glm::vec3 PMModel::barycentric_coords(const glm::vec3& p, size_t ii0, size_t ii1, size_t ii2) {
-    /*glm::vec3 v0, v1, v2;
-    float d00, d01, d11, denom;
-    v2 = p - mci.vertices[tr_ind.x].position;
-    auto fres = bcache.find(tr_ind);
-    if (false && fres != bcache.end()) {
-        v0 = fres->second.v0;
-        v1 = fres->second.v1;
-        d00 = fres->second.d00;
-        d01 = fres->second.d01;
-        d11 = fres->second.d11;
-        denom = fres->second.denom;
-    }
-    else {
-        v0 = mci.vertices[tr_ind.y].position - mci.vertices[tr_ind.x].position;
-        v1 = mci.vertices[tr_ind.z].position - mci.vertices[tr_ind.x].position;
-        d00 = glm::dot(v0, v0);
-        d01 = glm::dot(v0, v1);
-        d11 = glm::dot(v1, v1);
-        denom = d00 * d11 - d01 * d01;
-        bcache[tr_ind] = BarycentricCache(v0, v1, d00, d01, d11, denom);
-    }
-    float d20 = glm::dot(v2, v0);
-    float d21 = glm::dot(v2, v1);
-    glm::vec3 res;
-    res.y = (d11 * d20 - d01 * d21) / denom; // v
-    res.z = (d00 * d21 - d01 * d20) / denom; // w
-    res.x = 1.0f - res.y - res.z; // u*/
-    auto p0 = mci.vertices[ii0].position;
-    auto p1 = mci.vertices[ii1].position;
-    auto p2 = mci.vertices[ii2].position;
+float calculateTriangleArea(const glm::vec2& v0, const glm::vec2& v1, const glm::vec2& v2)
+{
+    return 0.5f * glm::abs((v1.x - v0.x) * (v2.y - v0.y) - (v2.x - v0.x) * (v1.y - v0.y));
+}
+glm::vec3 PMModel::barycentric_coords(const glm::vec2& st, size_t ii0, size_t ii1, size_t ii2) const {
+    auto& st0 = mci.vertices[ii0].texcoord;
+    auto& st1 = mci.vertices[ii1].texcoord;
+    auto& st2 = mci.vertices[ii2].texcoord;
+    float areaABC = calculateTriangleArea(st0, st1, st2);
 
-    float a = glm::distance(p0, p1);
-    float b = glm::distance(p1, p2);
-    float c = glm::distance(p2, p0);
+    float areaPBC = calculateTriangleArea(st, st1, st2);
+    float areaPCA = calculateTriangleArea(st0, st, st2);
+    float areaPAB = calculateTriangleArea(st0, st1, st);
 
-    float totalarea = triarea(a, b, c);
+    // Calculate the barycentric coordinates using the areas of the sub-triangles
+    float barycentricA = areaPBC / areaABC;
+    float barycentricB = areaPCA / areaABC;
+    float barycentricC = areaPAB / areaABC;
 
-    // compute the distances from the outer vertices to the inner vertex
-    float length0 = glm::distance(p0, p);
-    float length1 = glm::distance(p1, p);
-    float length2 = glm::distance(p2, p);
-    glm::vec3 res;
-    // divide the area of each small triangle by the area of the big triangle
-    res.x = triarea(b, length1, length2) / totalarea;
-    res.y= triarea(c, length0, length2) / totalarea;
-    res.z = triarea(a, length0, length1) / totalarea;
-
-    return res;
+    return glm::vec3(barycentricA, barycentricB, barycentricC);
 }
 bool PMModel::traingle_intersection(const Ray& ray, bool in_object, const glm::vec3& v0,
     const glm::vec3& v1, const glm::vec3& v2, float& out, glm::vec3& uvw) const {
@@ -192,13 +163,6 @@ bool PMModel::traingle_intersection(const Ray& ray, bool in_object, const glm::v
     C = glm::cross(edge0, vp0);
     float w = glm::dot(N, C);
     if (w < 0) return false; // P is on the right side
-
-    // edge 1
-    /*glm::vec3 edge1 = v2 - v1;
-    glm::vec3 vp1 = P - v1;
-    C = glm::cross(edge1, vp1);
-    float u = glm::dot(N, C);
-    if (u < 0)  return false; // P is on the right side*/
 
     // edge 2
     glm::vec3 edge2 = v0 - v2;
@@ -277,9 +241,6 @@ bool PMModel::intersection(const Ray& ray, bool in_object, float& intersection,
     auto& n1 = mci.vertices[ii1].normal;
     auto& n2 = mci.vertices[ii2].normal;
     normal = glm::normalize(n0 * uvw.x + n1 * uvw.y + n2 * uvw.z);
-    /*normal.x = n0.x * uvw.y + n1.x * uvw.z + n2.x * uvw.x;
-    normal.y = n0.y * uvw.y + n1.y * uvw.z + n2.y * uvw.x;
-    normal.z = n0.z * uvw.y + n1.z * uvw.z + n2.z * uvw.x;*/
     return true;
 }
 glm::vec3 PMModel::get_normal(size_t i) const {
@@ -288,27 +249,64 @@ glm::vec3 PMModel::get_normal(size_t i) const {
 void PMModel::get_normal(size_t ii0, size_t ii1, size_t ii2, glm::vec3& point, glm::vec3& normal) {
     if (mci.smooth) {
         auto uvw = barycentric_coords(point, ii0, ii1, ii2);
-        //normal = glm::normalize(mci.vertices[inter_ind.x].normal * uvw.x +
-        //    mci.vertices[inter_ind.y].normal * uvw.y + mci.vertices[inter_ind.z].normal * uvw.z);
         auto np  = mci.vertices[ii0].position * uvw.x +
             mci.vertices[ii1].position * uvw.y + mci.vertices[ii2].position * uvw.z;
-        auto& n0 = mci.vertices[ii0].normal;
-        auto& n1 = mci.vertices[ii1].normal;
-        auto& n2 = mci.vertices[ii2].normal;
-
-        if (!vec3_equal(point, np)) {
-           // std::cout << np.x << " " << np.y << " " << np.z << std::endl;
-            auto a = 1;
-        }
-        //point = np;
-        normal.x = n0.x * uvw.x + n1.x * uvw.y + n2.x * uvw.z;
-        normal.y = n0.y * uvw.x + n1.y * uvw.y + n2.y * uvw.z;
-        normal.z = n0.z * uvw.x + n1.z * uvw.y + n2.z * uvw.z;
-
-        //point += normal * 0.1f;
+        normal = interpolate_uvw(mci.vertices[ii0].position, mci.vertices[ii1].position,
+            mci.vertices[ii2].position, uvw);
         return;
     }
     normal = mci.vertices[ii0].normal;
+}
+bool PMModel::st_in_triangle(const glm::vec2& st, size_t ii0, size_t ii1, size_t ii2, glm::vec3& uvw) const {
+    uvw = barycentric_coords(st, ii0, ii1, ii2);
+    bool succ = uvw.x >= 0.0f && uvw.y >= 0.0f && uvw.z >= 0.0f;
+    uvw = glm::normalize(uvw);
+    return succ;
+}
+bool PMModel::interpolate_by_st(const glm::vec2& st, glm::vec3& position, glm::vec3& normal) const {
+    glm::vec3 uvw;
+    size_t l = 0;
+    size_t i = 0;
+    bool succ;
+    while (l < mci.lengths.size()) {
+        if (mci.lengths[l] == 3) {
+            succ = st_in_triangle(st, i, i + 1, i + 2, uvw);
+            if (succ) {
+                position = interpolate_uvw(mci.vertices[i].position, mci.vertices[i + 1].position,
+                    mci.vertices[i + 2].position, uvw);
+                normal   = interpolate_uvw(mci.vertices[i].normal, mci.vertices[i + 1].normal,
+                    mci.vertices[i + 2].normal, uvw);
+                return true;
+            }
+            i += 3;
+        }
+        else if (mci.lengths[l] == 4) {
+            succ = st_in_triangle(st, i, i + 1, i + 3, uvw);
+            if (succ) {
+                position = interpolate_uvw(mci.vertices[i].position, mci.vertices[i + 1].position,
+                    mci.vertices[i + 3].position, uvw);
+                normal = interpolate_uvw(mci.vertices[i].normal, mci.vertices[i + 1].normal,
+                    mci.vertices[i + 3].normal, uvw);
+                return true;
+            }
+            else {
+                succ = st_in_triangle(st, i + 1, i + 2, i + 3, uvw);
+                if (succ) {
+                    position = interpolate_uvw(mci.vertices[i + 1].position, mci.vertices[i + 2].position,
+                        mci.vertices[i + 3].position, uvw);
+                    normal = interpolate_uvw(mci.vertices[i + 1].normal, mci.vertices[i + 2].normal,
+                        mci.vertices[i + 3].normal, uvw);
+                    return true;
+                }
+            }
+            i += 4;
+        }
+        else {
+            throw std::exception("Not implemented");
+        }
+        l++;
+    }
+    return false;
 }
 const Material* PMModel::get_material() const {
     return &mci.material;
@@ -443,10 +441,33 @@ PMScene::PMScene() {
 PMScene::PMScene(std::vector<PMPreset>&& presets) :camera() {
     this->presets = presets;
     this->settings.active_preset = 0;
+    this->old_preset = 0;
 }
-void PMScene::check_preset() {
-    camera.set_position(presets[settings.active_preset].pos);
-    camera.look_to(presets[settings.active_preset].dir);
+void PMScene::update_camera() {
+    if (check_presets()) {
+        camera.set_position(presets[settings.active_preset].pos);
+        camera.look_to(presets[settings.active_preset].dir);
+    }
+}
+bool PMScene::check_presets() {
+    if (old_preset == settings.active_preset) {
+        return false;
+    }
+    old_preset = settings.active_preset;
+    return true;
+}
+std::vector<std::string> PMScene::get_names() const {
+    std::vector<std::string> res;
+    for (auto& m : presets[settings.active_preset].objects) {
+        res.push_back(m.name);
+    }
+    return res;
+}
+const std::string& PMScene::global_map_path() const {
+    return presets[settings.active_preset].global_map_path;
+}
+const std::string& PMScene::caustic_map_path() const {
+    return presets[settings.active_preset].caustic_map_path;
 }
 std::vector<PMModel>& PMScene::objects() {
     return presets[settings.active_preset].objects;

@@ -34,7 +34,8 @@ class PMModel {
     std::unordered_map<glm::vec3, BarycentricCache, Vec3Hash> bcache;
     ModelConstructInfo mci;
     size_t id;
-    glm::vec3 barycentric_coords(const glm::vec3& point, size_t ii0, size_t ii1, size_t ii2);
+    bool st_in_triangle(const glm::vec2& uv, size_t ii0, size_t ii1, size_t ii2, glm::vec3& uvw) const;
+    glm::vec3 barycentric_coords(const glm::vec2& uv, size_t ii0, size_t ii1, size_t ii2) const;
     bool traingle_intersection(const Ray& ray, bool in_object, const glm::vec3& p0,
         const glm::vec3& p1, const glm::vec3& p2, float& out, glm::vec3& uvw) const;
     LightSource* ls;
@@ -55,6 +56,7 @@ public:
     void get_normal(size_t ii0, size_t ii1, size_t ii2, glm::vec3& point, glm::vec3& normal);
     const LightSource* get_ls() const;
     std::pair<glm::vec3, glm::vec3> get_radiation_info() const;
+    bool interpolate_by_st(const glm::vec2& st, glm::vec3& point, glm::vec3& normal) const;
 };
 class PMCamera {
     glm::vec3 position, front, up, right, world_up;
@@ -76,11 +78,15 @@ public:
 struct PMPreset {
     std::vector<PMModel> objects;
     glm::vec3 pos, dir;
+    std::string global_map_path;
+    std::string caustic_map_path;
+
 };
 struct PMScene {
     std::vector<PMPreset> presets;
     PMSceneSettings settings;
     PMCamera camera;
+    int old_preset;
     /*
     * 1    2
     * |    ^
@@ -90,6 +96,10 @@ struct PMScene {
     glm::vec3 right_upper, left_lower, normal;
     PMScene();
     PMScene(std::vector<PMPreset>&& presets);
-    void check_preset();
+    void update_camera();
+    bool check_presets();
+    std::vector<std::string> get_names() const;
     std::vector<PMModel>& objects();
+    const std::string& global_map_path() const;
+    const std::string& caustic_map_path() const;
 };

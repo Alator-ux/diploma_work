@@ -60,5 +60,9 @@ public:
     PhotonMapping();
     void init(PMDrawer* drawer, std::vector<PMPreset>&& presets, PMSettingsUpdater& pmsu);
     void build_map();
+    void save();
+    void load();
     void render();
+    void gen_caustic_texture();
+    void check_names();
 };

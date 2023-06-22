@@ -1,5 +1,6 @@
 #pragma once
-
+#include <string>
+#include <vector>
 struct PhotonMapSettings {
     enum FilterType { none = 0, cone, gaussian };
     FilterType ftype = none;
@@ -14,11 +15,18 @@ struct PhotonMapSettings {
 };
 
 struct PhotonMappingSettings {
+    struct TextureCreator {
+        std::vector<std::string> names;
+        int resolution;
+        std::string directory = "caustic_textures";
+        std::string name;
+    };
     // disable photon mapping for direct illumination
     bool dpmdi = false;
     int max_rt_depth = 5;
     float ca_mult = 1.f;
     float gl_mult = 1.f;
+    TextureCreator tcreator;
 };
 
 struct PMSceneSettings {
@@ -86,6 +94,7 @@ class PMSettingsUpdater {
     PMDrawerSettings* d_settings;
     PMSceneSettings* sc_settings;
 public:
+    bool update_names = false;
     WindowSettings window_settings;
     void link_main(PhotonMappingSettings* ms) {
         main_settings = ms;
@@ -124,7 +133,18 @@ public:
     void update_max_rt(size_t depth) {
         main_settings->max_rt_depth = depth;
     }
-
+    void update_tex_resol(int value) {
+        main_settings->tcreator.resolution = value;
+    }
+    void update_tex_dir(const std::string& value) {
+        main_settings->tcreator.directory = value;
+    }
+    void update_texmodel_name(const std::string& value) {
+        main_settings->tcreator.name = value;
+    }
+    const std::vector<std::string>& get_names() {
+        return main_settings->tcreator.names;
+    }
     /* ----------Photon Maps Settings---------- */
     /// <summary>
     /// Update the number of photons to be emitted

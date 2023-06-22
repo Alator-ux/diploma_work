@@ -12,6 +12,7 @@ void PhotonMapping::init(PMDrawer* drawer, std::vector<PMPreset>&& presets, PMSe
     pmsu.link_pc(&photon_collector.settings);
     pmsu.link_main(&settings);
     pmsu.link_scene(&scene.settings);
+    settings.tcreator.names = scene.get_names();
 }
 void PhotonMapping::emit(const PMModel& ls) {
     size_t ne = 0;// Number of emitted photons
@@ -254,14 +255,14 @@ glm::vec3 PhotonMapping::render_trace(const Ray& ray, bool in_object, int depth,
         drawer->set_rgb(i, j, re * di_op, PMDrawer::di, depth);
         if (settings.dpmdi) {
             if (lcount == 0) {
-                global_map.radiance_estimate(ray.dir, inter_p, normal, re);
+                global_map.radiance_estimate(inter_p, normal, re);
                 re *= settings.gl_mult;
                 drawer->set_rgb(i, j, re * di_op, PMDrawer::gi, depth);
             }
         }
         else {
             res += re * di_op;
-            global_map.radiance_estimate(ray.dir, inter_p, normal, re);
+            global_map.radiance_estimate(inter_p, normal, re);
             re *= settings.gl_mult;
             drawer->set_rgb(i, j, re * di_op, PMDrawer::gi, depth);
         }
@@ -296,7 +297,7 @@ glm::vec3 PhotonMapping::render_trace(const Ray& ray, bool in_object, int depth,
     res += mat->emission;
     drawer->set_rgb(i, j, mat->emission, PMDrawer::em, depth);
     glm::vec3 caustic(0.f);
-    if (caustic_map.radiance_estimate(ray.dir, inter_p, normal, caustic)) {
+    if (caustic_map.radiance_estimate(inter_p, normal, caustic)) {
         auto tres = caustic * mat->opaque * settings.ca_mult;
         res += tres;
         drawer->set_rgb(i, j, tres, PMDrawer::ca, depth);
@@ -310,30 +311,7 @@ void PhotonMapping::render() {
     float width = drawer->get_width();
     float height = drawer->get_height();
     scene.camera.set_hw(height, width);
-    scene.check_preset();
-    //scene.camera = glm::vec3(-0.82277, 1.6047, 1.4969);
-    //scene.camera = glm::vec3(-0.38551, -0.5847, 0.68857);
-
-    /* Вине глассе
-    scene.camera.set_position(glm::vec3(2.f, 1.f, 4.f));
-    scene.camera.look_to(glm::vec3(-0.3f, -0.21f, -0.87f));*/
-
-
-    /* Ring )))*/
-    //scene.camera.set_position(glm::vec3(0.f, 1.f, 1.f));
-    //scene.camera.look_at(glm::vec3(0.f));
-    
-    
-    /*Sphere*/
-    //scene.camera.set_position(glm::vec3(-0.00999999046, 0.795000017, 2.49000001));
-    //scene.camera.look_to(glm::vec3(0.f, 0.f, -1.f));
-
-    //scene.camera.set_position(glm::vec3(2.5f, 0.75f, 1.25f));
-    //scene.camera.look_at(glm::vec3(0.5f, 0.f, 1.0f));
-
-    /*water
-    scene.camera.set_position(glm::vec3(-0.00999999046, 0.795000017, 1.99000001));
-    scene.camera.look_to(glm::vec3(0.f, 0.f, -1.f));*/
+    scene.update_camera();
 
     glm::vec3 origin = scene.camera.get_position();
     for (int j = 0; j < height; j++) {
@@ -349,6 +327,66 @@ void PhotonMapping::render() {
     }
     global_map.total_locate_time();
     std::cout << "Rendering has ended" << std::endl;
+}
+void PhotonMapping::save() {
+    global_map.save(scene.global_map_path());
+    caustic_map.save(scene.caustic_map_path());
+}
+void PhotonMapping::load() {
+    global_map.load(scene.global_map_path());
+    caustic_map.load(scene.caustic_map_path());
+}
+void PhotonMapping::check_names() {
+    if (scene.check_presets()) {
+        settings.tcreator.names = scene.get_names();
+    }
+}
+void PhotonMapping::gen_caustic_texture() {
+    cimg_library::CImg<unsigned char> texture(settings.tcreator.resolution, settings.tcreator.resolution, 
+        1, 3, 0);
+    auto objs = scene.objects();
+    PMModel model;
+    for (auto& tmodel : objs) {
+        if (tmodel.name == settings.tcreator.name) {
+            model = tmodel;
+            break;
+        }
+    }
+    
+    glm::vec3 interpolated_position(0.0f);
+    glm::vec3 interpolated_normal(0.0f);
+    cimg_forXY(texture, x, y) {
+        glm::vec2 st(static_cast<float>(x) / (settings.tcreator.resolution - 1), 
+            static_cast<float>(y) / (settings.tcreator.resolution - 1));
+
+        // Интерполяция координат между точками
+        
+        if (!model.interpolate_by_st(st, interpolated_position, interpolated_normal)) {
+            std::cout << "Model has no texture coordinates" << std::endl;
+            return;
+        }
+        
+
+        glm::vec3 ca(0.f);
+        if (!caustic_map.radiance_estimate(interpolated_position, interpolated_normal, ca)) {
+            std::cout << "The caustic map probably doesn't exist" << std::endl;
+        }
+        ca *= settings.ca_mult;
+        ca = glm::min(ca, 1.f);
+        // Запись цвета каустики в текстуру
+        texture(x, y, 0, 0) = static_cast<unsigned char>(ca.r * 255);
+        texture(x, y, 0, 1) = static_cast<unsigned char>(ca.g * 255);
+        texture(x, y, 0, 2) = static_cast<unsigned char>(ca.b * 255);
+    }
+
+    // Генерируем уникальное имя файла на основе текущего времени
+    std::time_t now = std::time(nullptr);
+    std::string filename = "./" + settings.tcreator.directory + "/caustic_texture_" + std::to_string(now) + ".bmp";
+
+    // Сохраняем изображение в файл
+    texture.save(filename.c_str());
+
+    std::cout << "Текстура каустики успешно сохранена: " << filename << std::endl;
 }
 float PhotonMapping::BRDF(glm::vec3 direction, glm::vec3 location, glm::vec3 normal, const Material* mat) {
     glm::vec3 halfVector = glm::normalize(direction + glm::normalize(location));
