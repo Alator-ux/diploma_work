@@ -407,6 +407,7 @@ void PMCamera::set_hw(float height, float width) {
     this->aspect = height / width;
 }
 void PMCamera::set_position(const glm::vec3& pos) {
+    print_vec3(pos);
     position = pos;
 }
 glm::vec3 PMCamera::get_position() {
@@ -444,16 +445,15 @@ PMScene::PMScene(std::vector<PMPreset>&& presets) :camera() {
     this->old_preset = 0;
 }
 void PMScene::update_camera() {
-    if (check_presets()) {
-        camera.set_position(presets[settings.active_preset].pos);
-        camera.look_to(presets[settings.active_preset].dir);
-    }
+    camera.set_position(presets[settings.active_preset].pos);
+    camera.look_to(presets[settings.active_preset].dir);
 }
 bool PMScene::check_presets() {
     if (old_preset == settings.active_preset) {
         return false;
     }
     old_preset = settings.active_preset;
+    update_camera();
     return true;
 }
 std::vector<std::string> PMScene::get_names() const {
